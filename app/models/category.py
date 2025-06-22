@@ -16,7 +16,7 @@ class Category(Base):
 
     products = relationship("Product", back_populates="category", uselist=True)
 
-
-from sqlalchemy.schema import CreateTable
-print(CreateTable(Product.__table__))
-print(CreateTable(Category.__table__))
+#
+# from sqlalchemy.schema import CreateTable
+# print(CreateTable(Product.__table__))
+# print(CreateTable(Category.__table__))
