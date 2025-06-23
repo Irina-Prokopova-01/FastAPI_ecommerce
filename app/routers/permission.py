@@ -15,6 +15,7 @@ router = APIRouter(prefix='/permission', tags=['permission'])
 
 @router.patch('/')
 async def supplier_permission(db: Annotated[AsyncSession, Depends(get_db)], get_user: Annotated[dict, Depends(get_current_user)], user_id: int):
+    """Changes the user status to supplier or buyer"""
     if get_user.get('is_admin'):
         user = await db.scalar(select(User).where(User.id == user_id))
 
@@ -46,6 +47,7 @@ async def supplier_permission(db: Annotated[AsyncSession, Depends(get_db)], get_
 
 @router.delete('/delete')
 async def delete_user(db: Annotated[AsyncSession, Depends(get_db)], get_user: Annotated[dict, Depends(get_current_user)], user_id: int):
+    """Removes a user, setting their status to inactive"""
     if get_user.get('is_admin'):
         user = await db.scalar(select(User).where(User.id == user_id))
 

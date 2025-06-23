@@ -29,6 +29,7 @@ bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_user(db: Annotated[AsyncSession, Depends(get_db)], create_user: CreateUser):
+    """Creates a new user in the system"""
     await db.execute(insert(User).values(first_name=create_user.first_name,
                                          last_name=create_user.last_name,
                                          username=create_user.username,
@@ -43,6 +44,7 @@ async def create_user(db: Annotated[AsyncSession, Depends(get_db)], create_user:
 
 
 async def authenticate_user(db: Annotated[AsyncSession, Depends(get_db)], username: str, password: str):
+    """Authenticates a user by username and password"""
     user = await db.scalar(select(User).where(User.username == username))
     if not user or not bcrypt_context.verify(password, user.hashed_password) or user.is_active == False:
         raise HTTPException(
@@ -55,6 +57,7 @@ async def authenticate_user(db: Annotated[AsyncSession, Depends(get_db)], userna
 
 async def create_access_token(username: str, user_id: int, is_admin: bool, is_supplier: bool, is_customer: bool,
                               expires_delta: timedelta):
+    """Generates a JWT access token for the authenticated user"""
     payload = {
         'sub': username,
         'id': user_id,
@@ -71,6 +74,7 @@ async def create_access_token(username: str, user_id: int, is_admin: bool, is_su
 
 @router.post('/token')
 async def login(db: Annotated[AsyncSession, Depends(get_db)], form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    """Authenticates the user and creates an access token"""
     user = await authenticate_user(db, form_data.username, form_data.password)
 
     token = await create_access_token(user.username, user.id, user.is_admin, user.is_supplier, user.is_customer,
@@ -83,6 +87,7 @@ async def login(db: Annotated[AsyncSession, Depends(get_db)], form_data: Annotat
 
 # async def get_current_user(token: Annotated[str, Depends(OAuth2PasswordBearer(tokenUrl="auth/token"))]): тоже самое
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    """Extracts the currently authenticated user from the token"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str | None = payload.get('sub')
@@ -139,6 +144,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
 @router.get('/read_current_user')
 async def read_current_user(user: dict = Depends(get_current_user)):
+    """Gets information about the currently authenticated user."""
     return {'User': user}
 
 # from fastapi import APIRouter, Depends, status, HTTPException

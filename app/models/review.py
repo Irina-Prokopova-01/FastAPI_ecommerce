@@ -7,6 +7,7 @@ from app.backend.db import Base
 
 
 class Review(Base):
+    """Model of review"""
     __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True, index=True)

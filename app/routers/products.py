@@ -15,6 +15,7 @@ router = APIRouter(prefix='/products', tags=['products'])
 
 @router.get('/')
 async def all_products(db: Annotated[AsyncSession, Depends(get_db)]):
+    """Gets all active products with stock greater than 0"""
     products = await db.scalars(select(Product).where(Product.is_active == True, Product.stock > 0))
     all_products = products.all()
     if not all_products:
@@ -27,6 +28,7 @@ async def all_products(db: Annotated[AsyncSession, Depends(get_db)]):
 
 @router.post('/')
 async def create_product(db: Annotated[AsyncSession, Depends(get_db)], create_product: CreateProduct, get_user: Annotated[dict, Depends(get_current_user)]):
+    """Creates a new product"""
     if get_user.get('is_supplier') or get_user.get('is_admin'):
         category = await db.scalar(select(Category).where(Category.id == create_product.category))
         if category is None:
@@ -57,6 +59,7 @@ async def create_product(db: Annotated[AsyncSession, Depends(get_db)], create_pr
 
 @router.get('/{category_slug}')
 async def product_by_category(db: Annotated[AsyncSession, Depends(get_db)], category_slug: str):
+    """Gets products (in a category and its subcategories) by category slug"""
     category = await db.scalar(select(Category).where(Category.slug == category_slug))
     if category is None:
         raise HTTPException(
@@ -72,6 +75,7 @@ async def product_by_category(db: Annotated[AsyncSession, Depends(get_db)], cate
 
 @router.get('/detail/{product_slug}')
 async def product_detail(db: Annotated[AsyncSession, Depends(get_db)], product_slug: str):
+    """Gets product details by its slug(stock > 0)"""
     product = await db.scalar(
         select(Product).where(Product.slug == product_slug, Product.is_active == True, Product.stock > 0))
     if product is None:
@@ -85,6 +89,7 @@ async def product_detail(db: Annotated[AsyncSession, Depends(get_db)], product_s
 @router.put('/{product_slug}')
 async def update_product(db: Annotated[AsyncSession, Depends(get_db)], product_slug: str,
                          update_product_model: CreateProduct, get_user: Annotated[dict, Depends(get_current_user)]):
+    """Updates product information based on its slug"""
     if get_user.get('is_supplier') or get_user.get('is_admin'):
         product_update = await db.scalar(select(Product).where(Product.slug == product_slug))
         if product_update is None:
@@ -128,6 +133,7 @@ async def update_product(db: Annotated[AsyncSession, Depends(get_db)], product_s
 @router.delete('/{product_slug}')
 async def delete_product(db: Annotated[AsyncSession, Depends(get_db)], product_slug: str,
                          get_user: Annotated[dict, Depends(get_current_user)]):
+    """Removes a product by its slug (makes it inactive)"""
     product_delete = await db.scalar(select(Product).where(Product.slug == product_slug))
     if product_delete is None:
         raise HTTPException(

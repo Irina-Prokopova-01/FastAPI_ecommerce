@@ -14,6 +14,7 @@ router = APIRouter(prefix='/reviews', tags=['reviews'])
 
 @router.get('/')
 async def all_reviews(db: Annotated[AsyncSession, Depends(get_db)]):
+    """Gets all active reviews"""
     reviews = await db.scalars(select(Review).where(Review.is_active == True))
     all_review = reviews.all()
     if not all_review:
@@ -26,6 +27,7 @@ async def all_reviews(db: Annotated[AsyncSession, Depends(get_db)]):
 
 @router.post('/')
 async def add_review(db: Annotated[AsyncSession, Depends(get_db)], create_review: CreateReview, get_user: Annotated[dict, Depends(get_current_user)]):
+    """Adds a new review for a product."""
     if get_user.get('is_supplier'):
         await db.execute(insert(Review).values(product_id=create_review.product_id,
                                                comment=create_review.comment,
@@ -60,6 +62,7 @@ async def add_review(db: Annotated[AsyncSession, Depends(get_db)], create_review
 @router.delete('/{review_id}')
 async def delete_reviews(db: Annotated[AsyncSession, Depends(get_db)], review_id: int,
                          get_user: Annotated[dict, Depends(get_current_user)]):
+    """Deletes a review by ID"""
     review_delete = await db.scalar(select(Review).where(Review.id == review_id))
     if review_delete is None:
         raise HTTPException(
@@ -82,6 +85,7 @@ async def delete_reviews(db: Annotated[AsyncSession, Depends(get_db)], review_id
 
 @router.get('/detail/{product_slug}')
 async def products_reviews(db: Annotated[AsyncSession, Depends(get_db)], product_slug: str):
+    """Gets the rating of a product based on its slug"""
     product = await db.scalar(
         select(Product).where(Product.slug == product_slug, Product.is_active == True, Product.stock > 0))
     if product is None:
