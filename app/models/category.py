@@ -6,6 +6,7 @@ from app.models.products import Product
 
 
 class Category(Base):
+    """Model of category"""
     __tablename__ = 'categories'
     __table_args__ = {'extend_existing': True}
     id = Column(Integer, primary_key=True, index=True)
@@ -16,7 +17,7 @@ class Category(Base):
 
     products = relationship("Product", back_populates="category", uselist=True)
 
-
-from sqlalchemy.schema import CreateTable
-print(CreateTable(Product.__table__))
-print(CreateTable(Category.__table__))
+#
+# from sqlalchemy.schema import CreateTable
+# print(CreateTable(Product.__table__))
+# print(CreateTable(Category.__table__))
