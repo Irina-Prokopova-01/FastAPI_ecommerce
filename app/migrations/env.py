@@ -1,7 +1,7 @@
 import asyncio
 from logging.config import fileConfig
 from app.backend.db import Base, DATABASE_URL
-from app.models import category, products, user, review
+from app.models import category, products, user, review, example
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
