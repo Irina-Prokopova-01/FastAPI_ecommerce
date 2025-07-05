@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from app.routers import permission
-
 from app.routers import auth
 from app.routers.category import router as category_router
 from app.routers.products import router as products_router
@@ -11,7 +10,6 @@ from app.routers.example import router as example_router
 from fastapi import FastAPI, Request
 # from fastapi.responses import JSONResponse
 from .log import log_middleware
-
 
 
 # logger.add("info.log", format="Log: [{extra[log_id]}:{time} - {level} - {message}]", level="INFO", enqueue = True)
