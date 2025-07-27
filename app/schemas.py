@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class CreateProduct(BaseModel):
@@ -13,3 +14,19 @@ class CreateProduct(BaseModel):
 class CreateCategory(BaseModel):
     name: str
     parent_id: int | None = None
+
+
+class CreateUser(BaseModel):
+    first_name: str
+    last_name: str
+    username: str
+    email: str
+    password: str
+
+
+class CreateReview(BaseModel):
+    comment: str | None = None
+    grade: float
+    product_id: int
+    user_id: int
+    comment_data: datetime
